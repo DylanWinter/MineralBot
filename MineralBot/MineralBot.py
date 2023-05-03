@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver.common.action_chains import ActionChains
 import re
 
 # Class containing all methods for MineralBot
@@ -9,10 +10,14 @@ class Bot():
         options.add_argument("--start-maximized")
 
         self.driver = webdriver.Chrome(executable_path= r"C:\Users\dylan\Desktop\MineralBot\Drivers\chromedriver.exe", chrome_options=options)
+        self.action = ActionChains(self.driver)
 
     def getSite(self, linkAddress):
         self.driver.get(linkAddress)
         self.driver.implicitly_wait(5)
+
+    def find(self, id, method="id"):
+        return self.driver.find_element(method, id)
         
     def findAndClick(self, id, waitTime = 5, method = "id"):
         button = self.driver.find_element(method, id)
@@ -31,8 +36,12 @@ class Bot():
             if i[0] == "#" or i == "\n":
                 pass
             else:
-                newCoord = i.strip()
-                targets.append(newCoord)
+                coords = i.split("|")
+                target = []
+                for j in coords:
+                    newCoord = j.strip()
+                    target.append(newCoord)
+                targets.append(target)
         coordList.close()
         return targets
                 
@@ -42,5 +51,48 @@ class Bot():
         nums = nums.split()
         return nums
     
+    def getTargetsList(self):
+        tgts = self.readCoords()
+        allTargets = []
+        for line in tgts:
+            tgt = []
+            for val in line:
+                coord = self.extractCoords(val)
+                tgt.append(coord)
+            allTargets.append(tgt)
+        return allTargets
+    
+    def moveTo(self, element):
+        self.action.move_to_element(element)
+        self.action.perform()
+
+    def moveBy(self, offsetH=0, offsetV=0):
+        self.action.move_by_offset(offsetH, offsetV)
+        self.action.perform()
+    
+    def selectArea(self, element, offsetX1, offsetY1, offsetX2, offsetY2):
+        self.action.move_to_element(element)
+        self.action.move_by_offset(offsetX1, offsetY1)
+        self.action.click_and_hold()
+        self.action.move_to_element(element)
+        self.action.move_by_offset(offsetX2, offsetY2)
+        self.action.release()
+        self.action.perform()
+
+    
+ 
+    
 
 ## Testing Zone ## 
+# bot = Bot()
+# tgts = bot.readCoords()
+# allTargets = []
+# for line in tgts:
+#     tgt = []
+#     for val in line:
+#         coord = bot.extractCoords(val)
+#         tgt.append(coord)
+#     allTargets.append(tgt)
+# print( allTargets)
+    
+        
