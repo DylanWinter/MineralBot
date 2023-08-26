@@ -1,6 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 import re
+from webdriver_manager.chrome import ChromeDriverManager
+
 
 # Class containing all methods for MineralBot
 class Bot():
@@ -9,8 +11,9 @@ class Bot():
         options.add_argument('--disable-blink-features=AutomationControlled')
         options.add_argument("--start-maximized")
 
-        self.driver = webdriver.Chrome(executable_path= r"C:\Users\dylan\Desktop\MineralBot\Drivers\chromedriver.exe", chrome_options=options)
+        self.driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
         self.action = ActionChains(self.driver)
+
 
     def getSite(self, linkAddress):
         self.driver.get(linkAddress)
@@ -19,13 +22,13 @@ class Bot():
     def find(self, id, method="id"):
         return self.driver.find_element(method, id)
         
-    def findAndClick(self, id, waitTime = 5, method = "id"):
+    def findAndClick(self, id, waitTime = 2, method = "id"):
         button = self.driver.find_element(method, id)
         button.click()
         self.driver.implicitly_wait(waitTime)
 
-    def findAndSend(self, id, key, waitTime = 5):
-        button = self.driver.find_element("id", id)
+    def findAndSend(self, id, key, waitTime = 2, method = "id"):
+        button = self.driver.find_element(method, id)
         button.send_keys(key)
         self.driver.implicitly_wait(waitTime)
 
@@ -78,6 +81,12 @@ class Bot():
         self.action.move_by_offset(offsetX2, offsetY2)
         self.action.release()
         self.action.perform()
+
+    def enterIframe(self, frameID):
+        self.driver.switch_to.frame(frameID)
+
+    def exitIframe(self):
+        self.driver.switch_to.default_content()
 
     
  

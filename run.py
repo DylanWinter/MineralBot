@@ -14,7 +14,7 @@ def openSite():
     bot.findAndClick("h_1618409713756o1")
     bot.findAndClick("div_d_1642075435596")
     # reaching staking map
-    bot.findAndClick("d_s1553779887997[2]")
+    bot.findAndClick("d_s1553779887997[1]")
     bot.findAndClick("d_1553779888004", method="name")
     bot.findAndClick("div_d_1550142656331")
     bot.findAndClick("d_1558981073505", method="name")
@@ -65,6 +65,31 @@ def listToInt(l):
     for i in range(len(l) - 1):
         l[i] = int(l[i])
 
+
+## Startup ##
+authorized = False
+time_wait = True
+print("MineralBot V1.1")
+while True:
+    resp = input("Type 'start' to start bot, 'test' to start in test mode:\n")
+    if resp.lower() == "start":
+        print("WARNING: THIS ALLOWS THE BOT TO MAKE PAYMENT")
+        resp2 = input("Enter 'authorized' to begin: ")
+        if resp2.lower() == "authorized":
+            authorized = True
+            print("Bot started, payment is authorized.")
+            break
+        else:
+            print("Cancelled.")
+            continue
+    elif resp.lower() == "test":
+        time_wait = False
+        print("Running in test mode, the bot will not wait until 9:00 AM to run.")
+        break
+    else:
+        continue
+    
+
 bot = mBot.Bot()
 openSite()
 # find the coords to start
@@ -93,32 +118,33 @@ offset2 = findPointCoords(coord2)
 
 bot.findAndClick("select-by-polygon")
 # waits until the clock hits 9:00 am
-print("Checking every 30 seconds...")
-while True:
-    clock_val = clock.get_attribute("value")
-    if "8:33" in clock_val and "PM" in clock_val:
-        break
-    else:
-        time.sleep(30)
-print("Checking every 5 seconds...")
-while True:
-    clock_val = clock.get_attribute("value")
-    if "8:33:5" in clock_val:
-        break
-    else:
-        time.sleep(5)
-print("Checking every second...")
-while True:
-    clock_val = clock.get_attribute("value")
-    if "8:33:58" in clock_val or "8:33:59" in clock_val:
-        break
-    else:
-        time.sleep(1)
-print("Checking as fast as possible...")
-while True:
-    clock_val = clock.get_attribute("value")
-    if "8:34:00" in clock_val:
-        break
+if time_wait:
+    print("Refreshing every 30 seconds...")
+    while True:
+        clock_val = clock.get_attribute("value")
+        if "8:59" in clock_val and "AM" in clock_val:
+            break
+        else:
+            time.sleep(30)
+    print("Refreshing every 5 seconds...")
+    while True:
+        clock_val = clock.get_attribute("value")
+        if "8:59:5" in clock_val:
+            break
+        else:
+            time.sleep(5)
+    print("Refreshing every second...")
+    while True:
+        clock_val = clock.get_attribute("value")
+        if "8:59:58" in clock_val or "8:59:59" in clock_val:
+            break
+        else:
+            time.sleep(1)
+    print("Refreshing as fast as possible...")
+    while True:
+        clock_val = clock.get_attribute("value")
+        if "9:00:00" in clock_val:
+            break
 
 start = time.time()
 
@@ -128,15 +154,22 @@ while True:
     if bot.find("d_1531394652148").get_attribute("value") != "":
         bot.findAndClick("d_1558981073511", method="name")
         break
+
 bot.findAndClick("d_1558981073515", method="name")
+bot.findAndClick("h_1568912130520o1", method="id")
+bot.findAndClick("d_1558981073517", method="name")
+bot.enterIframe("monerisFrame")
+bot.findAndSend("cardnumber", logins.card_number, method="name")
+bot.findAndSend("exp-date", logins.expiry_date, method="name")
+bot.findAndSend("cvc", logins.cvd, method="name")
+bot.exitIframe()
+bot.findAndClick("d_1565877925015", method="name")
+bot.findAndClick("h_1559640796736o1")
+if authorized:
+    bot.findAndClick("d_1531394653880", method="name")
+
 
 end = time.time()
 print("Time elapsed:", str(end - start) + "s")
-
-
-
-
-
-
 
 input()
